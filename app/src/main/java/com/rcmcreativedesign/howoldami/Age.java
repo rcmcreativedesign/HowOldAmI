@@ -1,5 +1,7 @@
 package com.rcmcreativedesign.howoldami;
 
+import java.time.LocalDate;
+
 public class Age {
     private Integer _years;
     private Integer _months;
@@ -17,8 +19,41 @@ public class Age {
         return _days;
     }
 
-    public void calculate(String userDate) {
+    public void calculate(String userDate, String compareDate) {
+        if (!validateUserDate(userDate) || !validateUserDate(compareDate))
+            return;
+        try {
+            LocalDate date = LocalDate.parse(userDate);
+            LocalDate compare = LocalDate.parse(compareDate);
+            if (date.isAfter(compare))
+                return;
+            _years = compare.getYear() - date.getYear();
+            _months = compare.getMonthValue() - date.getMonthValue();
+            if (_months < 0) {
+                _years--;
+                _months += 12;
+            }
+            _days = compare.getDayOfMonth() - date.getDayOfMonth();
+            if (_days < 0) {
+                _months--;
+                _days += date.plusMonths(1).lengthOfMonth();
+            }
+        }
+        catch (Exception e)
+        {}
+    }
 
+    private boolean validateUserDate(String userDate) {
+        try {
+            LocalDate date = LocalDate.parse(userDate);
+            if (date != null)
+                return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        return false;
     }
 
     public String getDisplay() {
@@ -42,7 +77,7 @@ public class Age {
         }
 
         if (_days > 0 && sb.length() > 0)
-            sb.append(",");
+            sb.append(", ");
 
         if (_days > 0) {
             if (_days == 1)
